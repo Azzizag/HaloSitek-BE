@@ -3,7 +3,7 @@
  * Central export untuk semua services
  */
 
-// Common Services (path diperbaiki)
+// Common Services
 const tokenGeneratorService = require('../../../common/services/token-generator.service');
 const emailService = require('../../../common/services/email.service');
 const paymentService = require('../../../common/services/payment.service');
@@ -12,6 +12,11 @@ const paymentService = require('../../../common/services/payment.service');
 const architectRegistrationService = require('./architect-registration.service');
 const architectAuthService = require('./architect-auth.service');
 const webhookService = require('./webhook.service');
+
+// NEW: Design, Certification, Portfolio Link Services
+const designService = require('./design.service');
+const certificationService = require('./certification.service');
+const portfolioLinkService = require('./portfolio-link.service');
 
 module.exports = {
   // Common Services
@@ -23,4 +28,9 @@ module.exports = {
   architectRegistrationService,
   architectAuthService,
   webhookService,
+
+  // NEW Services
+  designService,
+  certificationService,
+  portfolioLinkService,
 };
