@@ -238,6 +238,7 @@ model Arsipedia {
   content   String   @db.Text  // Long text content
   status    String   @default("DRAFT") // DRAFT, PUBLISHED
   tags      String?  // JSON array: ["Desain", "Tips", "Arsitektur"]
+  imagePath String
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -134,6 +134,7 @@ CREATE TABLE "arsipedia" (
     "content" TEXT NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'DRAFT',
     "tags" TEXT,
+    "imagePath" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

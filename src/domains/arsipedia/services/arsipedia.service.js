@@ -3,7 +3,8 @@ const ArsipediaRepository = require("../repositories/arsipedia.repository");
 class ArsipediaService {
 
   async create(data) {
-    const { adminId } = data;
+    const adminId  = data.adminId;
+    const imagePath = data.imagePath
 
     // Validasi adminId
     const admin = await ArsipediaRepository.isAdminExist(adminId);
@@ -12,6 +13,12 @@ class ArsipediaService {
       error.statusCode = 400;
       throw error;
     }
+
+    if (!imagePath) {
+     const error = new Error("Image is required");
+     error.statusCode = 400;
+     throw error;
+   }
 
     return await ArsipediaRepository.create(data);
   }
