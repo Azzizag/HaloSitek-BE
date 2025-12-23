@@ -32,6 +32,13 @@ router.post('/auth/refresh-token', adminAuthController.refreshToken);
 router.get('/auth/profile', authMiddleware.verifyAdmin, adminAuthController.getProfile);
 
 /**
+ * @route   GET /api/admins/auth/all
+ * @desc    Get all admins
+ * @access  Private (Admins only)
+ */
+router.get('/auth/all', authMiddleware.verifyAdmin, adminAuthController.getAllAdmins);
+
+/**
  * @route   GET /api/admins/auth/me
  * @desc    Get current admin info
  * @access  Private (Admins only)

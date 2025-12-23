@@ -128,6 +128,32 @@ class AdminAuthController {
     }
   }
 
+
+  /**
+  * Get all admins
+  */
+  async getAllAdmins(req, res) {
+    try {
+      const admins = await adminAuthService.getAllAdmins();
+
+      return ResponseFormatter.success(
+        res,
+        admins,                         // data dulu
+        "Admins retrieved successfully" // message
+      );
+
+    } catch (error) {
+      console.error("❌ Error getting all admins:", error.message);
+      return ResponseFormatter.error(
+        res,
+        error.message || "Failed to get admins",
+        500
+      );
+    }
+  }
+
+
+
   /**
    * Get Dashboard Statistics
    * GET /api/admins/auth/dashboard
@@ -141,7 +167,7 @@ class AdminAuthController {
     } catch (error) {
       next(error);
     }
-  }
+  } z
 }
 
 module.exports = new AdminAuthController();

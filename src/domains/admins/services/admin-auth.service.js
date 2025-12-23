@@ -136,6 +136,37 @@ class AdminAuthService {
   }
 
   /**
+ * Get all admins
+ * @returns {Promise<Array>} - List admin data
+ */
+  async getAllAdmins() {
+    try {
+      // ✅ jangan pakai include untuk scalar fields
+      const admins = await adminRepository.findAll(
+        {},                 // where
+        {},                 // include (kosong)
+        { createdAt: "desc" } // orderBy
+      );
+
+      // ✅ samakan output seperti getProfile (hanya field aman)
+      return admins.map((admin) => ({
+        id: admin.id,
+        email: admin.email,
+        username: admin.username,
+        fullName: admin.fullName,
+        role: admin.role,
+        createdAt: admin.createdAt,
+        updatedAt: admin.updatedAt,
+      }));
+    } catch (error) {
+      console.error("❌ Failed to get all admins:", error.message);
+      throw error;
+    }
+  }
+
+
+
+  /**
    * Change password
    * @param {String} adminId - Admin ID
    * @param {Object} passwordData - { oldPassword, newPassword }
