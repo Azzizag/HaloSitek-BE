@@ -164,10 +164,11 @@ class AuthMiddleware {
       // Verify token
       const decoded = JWTHelper.verifyToken(token);
 
-      // Check if role is ADMIN
-      if (decoded.role !== 'ADMIN') {
+      // Check if role is ADMIN or SUPER_ADMIN
+      if (!['ADMIN', 'SUPER_ADMIN'].includes(decoded.role)) {
         return ResponseFormatter.forbidden(res, 'Access denied. Admins only.');
       }
+
 
       // Attach admin info to request
       req.user = decoded;
@@ -180,6 +181,41 @@ class AuthMiddleware {
       return ResponseFormatter.unauthorized(res, 'Invalid or expired token');
     }
   }
+
+  /**
+ * Verify Super Admin Token
+ * Khusus untuk aksi sensitif admin management (add/edit/delete admin)
+ */
+  async verifySuperAdmin(req, res, next) {
+    try {
+      const authHeader = req.headers.authorization;
+
+      if (!authHeader) {
+        return ResponseFormatter.unauthorized(res, 'No token provided');
+      }
+
+      const token = JWTHelper.extractTokenFromHeader(authHeader);
+      if (!token) {
+        return ResponseFormatter.unauthorized(res, 'Invalid token format');
+      }
+
+      const decoded = JWTHelper.verifyToken(token);
+
+      // Only SUPER_ADMIN
+      if (decoded.role !== 'SUPER_ADMIN') {
+        return ResponseFormatter.forbidden(res, 'Access denied. Super Admins only.');
+      }
+
+      req.user = decoded;
+      next();
+    } catch (error) {
+      if (error instanceof AuthenticationError) {
+        return ResponseFormatter.unauthorized(res, error.message);
+      }
+      return ResponseFormatter.unauthorized(res, 'Invalid or expired token');
+    }
+  }
+
 
   /**
    * Optional Authentication
