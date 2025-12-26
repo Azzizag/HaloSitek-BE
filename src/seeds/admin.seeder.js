@@ -14,7 +14,7 @@ const admins = [
     email: 'admin@halositek.com',
     password: 'Admin123!',
     fullName: 'Super Admin',
-    role: 'SUPER_ADMIN',
+    role: 'ADMIN',
   },
   {
     email: 'admin2@halositek.com',

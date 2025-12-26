@@ -106,34 +106,90 @@ class DesignRepository extends BaseRepository {
   }
 
   /**
+  * Get distinct categories from designs (public)
+  * @returns {Promise<string[]>}
+  */
+  async getDistinctKategori() {
+    try {
+      const rows = await prisma.design.findMany({
+        where: { kategori: { not: null } },
+        select: { kategori: true },
+        distinct: ["kategori"],
+        orderBy: { kategori: "asc" },
+      });
+
+      return rows
+        .map((r) => (r.kategori || "").trim())
+        .filter(Boolean);
+    } catch (error) {
+      throw new DatabaseError(`Failed to fetch categories: ${error.message}`);
+    }
+  }
+
+
+
+  /**
    * Search designs (public)
    * @param {String} searchTerm - Search term
    * @param {Object} options - Query options
    * @returns {Promise<Object>} - { data, pagination }
    */
-  async searchPublic(searchTerm, options = {}) {
-    return await this.findWithPagination({
-      ...options,
-      where: {
+  async searchPublic({ q, kategori, page = 1, limit = 12 }) {
+    const skip = (Number(page) - 1) * Number(limit);
+
+    const AND = [];
+
+    if (q && q.trim()) {
+      const keyword = q.trim();
+      AND.push({
         OR: [
-          { title: { contains: searchTerm, mode: 'insensitive' } },
-          { description: { contains: searchTerm, mode: 'insensitive' } },
-          { kategori: { contains: searchTerm, mode: 'insensitive' } },
+          { title: { contains: keyword, mode: "insensitive" } },
+          { description: { contains: keyword, mode: "insensitive" } },
         ],
-      },
-      include: {
-        architect: {
-          select: {
-            id: true,
-            name: true,
-            profilePictureUrl: true,
-            tahunPengalaman: true,
+      });
+    }
+
+    if (kategori && kategori.trim()) {
+      AND.push({
+        kategori: { equals: kategori.trim(), mode: "insensitive" },
+      });
+    }
+
+    const where = AND.length ? { AND } : {};
+
+    const [data, total] = await Promise.all([
+      prisma.design.findMany({
+        where,
+        skip,
+        take: Number(limit),
+        orderBy: { createdAt: "desc" },
+        include: {
+          architect: {
+            select: {
+              id: true,
+              name: true,
+              profilePictureUrl: true,
+              tahunPengalaman: true,
+              areaPengalaman: true,
+            },
           },
         },
+      }),
+      prisma.design.count({ where }),
+    ]);
+
+    return {
+      data,
+      pagination: {
+        page: Number(page),
+        limit: Number(limit),
+        total,
+        totalPages: Math.ceil(total / Number(limit)),
       },
-      orderBy: options.orderBy || { createdAt: 'desc' },
-    });
+    };
   }
+
+
 
   /**
    * Find designs by category
@@ -145,7 +201,7 @@ class DesignRepository extends BaseRepository {
     return await this.findWithPagination({
       ...options,
       where: {
-        kategori: { contains: kategori, mode: 'insensitive' },
+        kategori: { equals: kategori, mode: 'insensitive' },
       },
       include: {
         architect: {

@@ -58,6 +58,32 @@ const uploadDesignImages = upload.fields([
 ]);
 
 // ============================================
+// ADMIN ROUTES (Admin only)
+// ============================================
+
+router.put(
+  '/admin/:id',
+  authMiddleware.verifyAdmin,     // <-- pastikan ada
+  uploadDesignImages,             // bisa update foto juga
+  designController.adminUpdateDesign
+);
+
+router.delete(
+  '/admin/:id',
+  authMiddleware.verifyAdmin,
+  designController.adminDeleteDesign
+);
+
+/**
+ * @route   GET /api/designs/meta/categories
+ * @desc    Get distinct categories
+ * @access  Public
+ */
+router.get("/meta/categories", designController.getKategoriList);
+
+
+
+// ============================================
 // PUBLIC ROUTES
 // ============================================
 

@@ -165,9 +165,10 @@ class AuthMiddleware {
       const decoded = JWTHelper.verifyToken(token);
 
       // Check if role is ADMIN or SUPER_ADMIN
-      if (!['ADMIN', 'SUPER_ADMIN'].includes(decoded.role)) {
+      if (decoded.role !== 'ADMIN') {
         return ResponseFormatter.forbidden(res, 'Access denied. Admins only.');
       }
+
 
 
       // Attach admin info to request
@@ -186,35 +187,6 @@ class AuthMiddleware {
  * Verify Super Admin Token
  * Khusus untuk aksi sensitif admin management (add/edit/delete admin)
  */
-  async verifySuperAdmin(req, res, next) {
-    try {
-      const authHeader = req.headers.authorization;
-
-      if (!authHeader) {
-        return ResponseFormatter.unauthorized(res, 'No token provided');
-      }
-
-      const token = JWTHelper.extractTokenFromHeader(authHeader);
-      if (!token) {
-        return ResponseFormatter.unauthorized(res, 'Invalid token format');
-      }
-
-      const decoded = JWTHelper.verifyToken(token);
-
-      // Only SUPER_ADMIN
-      if (decoded.role !== 'SUPER_ADMIN') {
-        return ResponseFormatter.forbidden(res, 'Access denied. Super Admins only.');
-      }
-
-      req.user = decoded;
-      next();
-    } catch (error) {
-      if (error instanceof AuthenticationError) {
-        return ResponseFormatter.unauthorized(res, error.message);
-      }
-      return ResponseFormatter.unauthorized(res, 'Invalid or expired token');
-    }
-  }
 
 
   /**

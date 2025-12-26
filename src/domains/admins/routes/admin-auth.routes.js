@@ -22,24 +22,7 @@ router.post('/auth/login', adminAuthController.login);
  * @desc    Add new admin
  * @access  Private (Super Admins only)
  */
-router.post('/auth/add', authMiddleware.verifySuperAdmin, adminAuthController.addAdmin);
-
-
-/**
- * @route   DELETE /api/admins/auth/:id
- * @desc    Delete admin
- * @access  Private (Admins only)
- */
-router.delete('/auth/:id', authMiddleware.verifySuperAdmin, adminAuthController.deleteAdmin);
-
-/**
- * @route   PUT /api/admins/auth/:id
- * @desc    Update admin by ID
- * @access  Private (Admins only)
- */
-router.put('/auth/:id', authMiddleware.verifySuperAdmin, adminAuthController.updateAdminById);
-
-
+router.post('/auth/add', authMiddleware.verifyAdmin, adminAuthController.addAdmin);
 
 /**
  * @route   POST /api/admins/auth/refresh-token

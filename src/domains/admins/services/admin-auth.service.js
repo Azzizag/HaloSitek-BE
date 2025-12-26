@@ -83,20 +83,27 @@ class AdminAuthService {
   }
 
   /**
- * Add new admin (create admin)
- * @param {Object} payload - { email, password, fullName, username, role }
- * @returns {Promise<Object>} - Created admin (safe fields)
- */
-  async addAdmin(payload) {
+  * Add new admin (create admin)
+  * Hanya admin khusus yang boleh menambahkan admin
+  *
+  * @param {Object} requester - admin dari JWT (req.user)
+  * @param {Object} payload - { email, password, fullName }
+  * @returns {Promise<Object>} - Created admin (safe fields)
+  */
+  async addAdmin(requester, payload) {
     try {
-      const { email, password, fullName, username, role } = payload || {};
+      // ✅ allowlist admin khusus
+      const ADMIN_CREATOR_EMAIL = "admin@halositek.com";
+      if (!requester || requester.email !== ADMIN_CREATOR_EMAIL) {
+        throw new ForbiddenError("Anda tidak memiliki izin untuk menambahkan admin");
+      }
 
-      // Validate input minimal
+      const { email, password, fullName } = payload || {};
+
       if (!email || !password || !fullName) {
         throw new ValidationError("Email, password, dan fullName wajib diisi");
       }
 
-      // Validate password strength (reuse utility)
       const passwordValidation = PasswordHasher.validatePasswordStrength(password);
       if (!passwordValidation.isValid) {
         throw new ValidationError(
@@ -105,20 +112,17 @@ class AdminAuthService {
         );
       }
 
-      // Hash password
       const hashedPassword = await PasswordHasher.hash(password);
 
-      // Create admin (repository sudah cek email duplikat)
       const created = await adminRepository.createAdmin({
         email,
         password: hashedPassword,
         fullName,
-        role: role || "ADMIN",
+        role: "ADMIN", // ✅ hardcode
       });
 
-      console.log("✅ Admin created:", created.email);
+      console.log("✅ Admin created:", created.email, "by", requester.email);
 
-      // Return safe fields (tanpa password)
       return {
         id: created.id,
         email: created.email,
@@ -132,6 +136,8 @@ class AdminAuthService {
       throw error;
     }
   }
+
+
 
   /**
  * Delete admin

@@ -58,33 +58,6 @@ class AdminAuthController {
   }
 
   /**
- * Update admin by ID
- * PUT /api/admins/auth/:id
- * Protected - Requires JWT token (ADMIN role)
- */
-  async updateAdminById(req, res, next) {
-    try {
-      const requesterAdminId = req.user.id; // dari JWT
-      const targetAdminId = req.params.id;
-
-      const updatedAdmin = await adminAuthService.updateAdminById(
-        requesterAdminId,
-        targetAdminId,
-        req.body
-      );
-
-      return ResponseFormatter.success(
-        res,
-        updatedAdmin,
-        "Admin updated successfully"
-      );
-    } catch (error) {
-      next(error);
-    }
-  }
-
-
-  /**
    * Change Password
    * POST /api/admins/auth/change-password
    * Protected - Requires JWT token (ADMIN role)
@@ -162,14 +135,13 @@ class AdminAuthController {
  */
   async addAdmin(req, res, next) {
     try {
-      const createdAdmin = await adminAuthService.addAdmin(req.body);
-
-      // 201 created
-      return ResponseFormatter.success(res, createdAdmin, "Admin created successfully", 201);
+      const admin = await adminAuthService.addAdmin(req.user, req.body);
+      return ResponseFormatter.success(res, admin, "Admin created successfully", 201);
     } catch (error) {
       next(error);
     }
   }
+
 
 
   /**
@@ -194,25 +166,6 @@ class AdminAuthController {
       );
     }
   }
-
-  /**
- * Delete admin
- * DELETE /api/admins/auth/:id
- * Protected - Requires JWT token (ADMIN role)
- */
-  async deleteAdmin(req, res, next) {
-    try {
-      const requesterAdminId = req.user.id;  // dari token
-      const targetAdminId = req.params.id;   // dari URL
-
-      const deleted = await adminAuthService.deleteAdmin(requesterAdminId, targetAdminId);
-
-      return ResponseFormatter.success(res, deleted, "Admin deleted successfully");
-    } catch (error) {
-      next(error);
-    }
-  }
-
 
   /**
    * Get Dashboard Statistics

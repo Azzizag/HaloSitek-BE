@@ -49,6 +49,58 @@ class DesignController {
   }
 
   /**
+ * Admin Update design
+ * PUT /api/designs/admin/:id
+ * Protected - Requires admin authentication
+ */
+  async adminUpdateDesign(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const files = {
+        foto_bangunan: req.files?.foto_bangunan || [],
+        foto_denah: req.files?.foto_denah || [],
+      };
+
+      const design = await designService.adminUpdateDesign(id, req.body, files);
+      return ResponseFormatter.success(res, design, 'Design updated successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * Admin Delete design
+   * DELETE /api/designs/admin/:id
+   * Protected - Requires admin authentication
+   */
+  async adminDeleteDesign(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const result = await designService.adminDeleteDesign(id);
+      return ResponseFormatter.success(res, null, result.message);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+
+  /**
+ * Get distinct categories (public)
+ * GET /api/designs/meta/categories
+ */
+  async getKategoriList(req, res, next) {
+    try {
+      const categories = await designService.getKategoriList();
+      return ResponseFormatter.success(res, categories, "Design categories fetched", 200);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+
+  /**
    * Get designs by architect (my designs)
    * GET /api/architects/auth/designs
    * Protected - Requires architect authentication
@@ -96,20 +148,27 @@ class DesignController {
    * GET /api/designs/search
    * Public
    */
+  // design.controller.js
+  // design.controller.js
   async searchDesigns(req, res, next) {
     try {
-      const { q, page, limit } = req.query;
+      const { q, kategori, city, location, page, limit } = req.query;
 
-      const result = await designService.searchDesigns(q, {
+      const result = await designService.searchDesigns({
+        q,
+        kategori,
+        city: city || location, // kompatibel dengan FE yang pakai "location"
         page,
         limit,
       });
 
-      return ResponseFormatter.success(res, result.data, 'Search completed successfully', 200);
+      return ResponseFormatter.success(res, result.data, "Search completed successfully", 200);
     } catch (error) {
       next(error);
     }
   }
+
+
 
   /**
    * Get designs by category
