@@ -21,6 +21,7 @@ const userAuthRoutes = require('./domains/users/routes/user-auth.routes');
 const adminUserRoutes = require('./domains/users/routes/admin-user.routes');
 const adminAuthRoutes = require('./domains/admins/routes/admin-auth.routes');
 const arsipediaRoutes = require('./domains/arsipedia/routes/arsipedia.routes');
+const viewRoutes = require("./domains/views/routes/view.routes");
 
 // NEW: admin architect & admin transaction routes
 const adminArchitectRoutes = require('./domains/architects/routes/architect-admin.routes');
@@ -56,6 +57,8 @@ router.use('/arsipedia', arsipediaRoutes);
 
 router.use('/admin/architects', adminArchitectRoutes);
 router.use('/admin/transactions', adminTransactionRoutes);
+
+router.use("/views", viewRoutes);
 
 
 module.exports = router;

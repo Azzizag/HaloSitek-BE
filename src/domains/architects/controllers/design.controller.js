@@ -157,7 +157,7 @@ class DesignController {
       const result = await designService.searchDesigns({
         q,
         kategori,
-        city: city || location, // kompatibel dengan FE yang pakai "location"
+        city: city || location, 
         page,
         limit,
       });
