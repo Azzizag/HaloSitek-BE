@@ -1,4 +1,3 @@
-const ArsipediaService = require("../services/arsipedia.service");
 const ResponseFormatter = require("../../../utils/response-formatter");
 const FileUploadHelper = require("../../../utils/file-upload-helper");
 

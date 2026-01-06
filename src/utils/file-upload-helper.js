@@ -34,31 +34,34 @@ class FileUploadHelper {
       process.env.NODE_ENV === "production"
     );
   }
-  static getStorage(destination = "uploads/temp") {
-    // ✅ di Vercel: jangan diskStorage
-    if (this.isReadOnlyFs()) {
-      return multer.memoryStorage();
-    }
-
+  static getStorage(destination = 'uploads/temp') {
     const normalizedDestination =
-      destination.startsWith("uploads/")
+      destination.startsWith('uploads/')
         ? destination
-        : path.join("uploads", destination);
+        : path.join('uploads', destination);
 
-    // ✅ perbaiki: ensureDirectoryExists harus pakai normalizedDestination
-    this.ensureDirectoryExists(normalizedDestination);
+    // ✅ Jangan pakai this.ensureDirectoryExists (biar tidak error "not a function")
+    try {
+      if (!fs.existsSync(normalizedDestination)) {
+        fs.mkdirSync(normalizedDestination, { recursive: true });
+      }
+    } catch (e) {
+      // kalau di Vercel/readonly, jangan crash—nanti kamu bisa pakai memory/cloud
+      console.warn("[FileUploadHelper.getStorage] mkdir skipped:", e.message);
+    }
 
     return multer.diskStorage({
       destination: (req, file, cb) => cb(null, normalizedDestination),
       filename: (req, file, cb) => {
-        const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
         const ext = path.extname(file.originalname);
         const nameWithoutExt = path.basename(file.originalname, ext);
-        const safeName = nameWithoutExt.replace(/[^a-zA-Z0-9]/g, "-");
-        cb(null, `${safeName}-${uniqueSuffix}${ext}`);
+        const filename = `${nameWithoutExt}-${uniqueSuffix}${ext}`;
+        cb(null, filename);
       },
     });
   }
+
 
   static imageFilter(req, file, cb) {
     const allowedTypes = ["image/jpeg", "image/jpg", "image/png"];
